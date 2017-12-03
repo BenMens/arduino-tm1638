@@ -20,13 +20,11 @@
 
 TM1638 tm1638(4,3,2);
 
-unsigned long nextUpdateTime;
-int8_t i=0;
 uint16_t keyMap[] = {
-  KEY_00,KEY_01,KEY_02,KEY_03,
-  KEY_04,KEY_05,KEY_06,KEY_07,
-  KEY_08,KEY_09,KEY_10,KEY_11,
-  KEY_12,KEY_13,KEY_14,KEY_15
+  KEY_00, KEY_01, KEY_02, KEY_03,
+  KEY_04, KEY_05, KEY_06, KEY_07,
+  KEY_08, KEY_09, KEY_10, KEY_11,
+  KEY_12, KEY_13, KEY_14, KEY_15
 };
 
 
@@ -53,24 +51,9 @@ void setup() {
   tm1638.setDigit(0xFF,0x00);
   tm1638.update();
   tm1638.setKeyboardCallback(handleKeyboardChange);
-
-  Serial.begin(115200);
-
-  nextUpdateTime = millis()+500;
 }
 
 
 void loop() {
-  unsigned long time = millis();
-
-  if (time>nextUpdateTime) {
-    // tm1638.scrollLeft();
-    // tm1638.setDigit(0x01,DIGIT_PATTERN(i));
-    // tm1638.update();
-
-    i = (i+1) % 16;
-    nextUpdateTime += 500;
-  }
-
-  tm1638.scan();
+  tm1638.scanKeyboard();
 }

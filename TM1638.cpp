@@ -1,6 +1,6 @@
 #include "TM1638.h"
 
-uint8_t digitToPattern[] = {
+const uint8_t digitToPattern[] PROGMEM = {
   0b00111111, // 0
   0b00000110, // 1
   0b01011011, // 2
@@ -40,19 +40,18 @@ void TM1638::begin() {
   digitalWrite(this->dio,HIGH);
 
   setDigit(0xff,0xff);
-  write(0b01000000);
-  write(0b11000000);
-  write(0b10001000);
+  setBrightness(0,true);
   update();
 }
 
 void TM1638::write(uint8_t command) {
-  write(command,NULL,0,true);
-}
+  digitalWrite(this->stb,LOW);
+  delayMicroseconds(1);
 
-void TM1638::update() {
-  write(0b01000000,NULL,0,false);
-  write(0b01000000,this->displayBuffer,sizeof(this->displayBuffer),true);
+  shiftOut(this->dio, this->clk, LSBFIRST, command);
+
+  delayMicroseconds(1);
+  digitalWrite(this->stb,HIGH);
 }
 
 void TM1638::write(uint8_t command,uint8_t *data,uint8_t len,boolean oddZero) {
@@ -72,6 +71,10 @@ void TM1638::write(uint8_t command,uint8_t *data,uint8_t len,boolean oddZero) {
 
   delayMicroseconds(1);
   digitalWrite(this->stb,HIGH);
+}
+
+void TM1638::update() {
+  write(0b01000000,this->displayBuffer,sizeof(this->displayBuffer),true);
 }
 
 void TM1638::setDigit(uint8_t mask,uint8_t pattern) {
@@ -106,8 +109,17 @@ void TM1638::scrollRight() {
   }
 }
 
+void TM1638::setBrightness(uint8_t brightness,bool on) {
+  if (on) {
+    write(0b10001000 | (brightness & 0b00000111));
+  }
+  else {
+    write(0b10000000 | (brightness & 0b00000111));
+  }
+}
 
-void TM1638::scan() {
+
+void TM1638::scanKeyboard() {
 
   digitalWrite(this->stb,LOW);
   delayMicroseconds(1);

@@ -3,9 +3,9 @@
 
 #include <arduino.h>
 
-#define DIGIT_PATTERN(x) digitToPattern[x]
+#define DIGIT_PATTERN(x) (uint8_t)pgm_read_word(&(digitToPattern[x]))
 
-extern uint8_t digitToPattern[];
+extern const uint8_t digitToPattern[] PROGMEM;
 
 typedef uint8_t TM1638DisplayBuffer[8];
 
@@ -22,8 +22,9 @@ class TM1638
     void setDigit(uint8_t mask,uint8_t pattern);
     void scrollLeft();
     void scrollRight();
-    void scan();
+    void scanKeyboard();
     void setKeyboardCallback(void(*keyboardCallback)(uint8_t (&)[4]));
+    void setBrightness(uint8_t brightness,bool on);
 
   private:
     TM1638DisplayBuffer displayBuffer;
